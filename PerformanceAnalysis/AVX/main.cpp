@@ -32,7 +32,7 @@ void EvaluateTiming(MatMatAVX<T>& data, float * result)
         std::size_t time = std::chrono::duration_cast<std::chrono::microseconds>(avx_stop - avx_start).count();
         total_time += time;
         min_time = std::min(min_time, time);
-        max_time = std::min(max_time, time);
+        max_time = std::max(max_time, time);
     }
 
     const double avg_time = static_cast<double>(total_time) / static_cast<double>(evaluation_iters);
