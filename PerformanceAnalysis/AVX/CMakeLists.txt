@@ -12,8 +12,6 @@ endif()
 set(CMAKE_C_COMPILER gcc-13)
 set(CMAKE_CXX_COMPILER g++-13)
 set(BOOST_ROOT /usr/include/boost CACHE STRING "Path to Boost install")
-set(XRT_INC_DIR /opt/xilinx/xrt/include CACHE STRING "Path to XRT cloned repo")
-set(XRT_LIB_DIR /opt/xilinx/xrt/lib CACHE STRING "Path to xrt_coreutil.lib")
 
 # Find packages
 find_package(Boost REQUIRED)
@@ -30,17 +28,14 @@ target_compile_definitions(main PUBLIC DISABLE_ABI_CHECK=1)
 set(CMAKE_CXX_FLAGS "-march=native -mavx512f -mavx512bw -mavx512vl -mavx512dq -mavx512bf16")
 
 target_include_directories (main PUBLIC
-        ${XRT_INC_DIR}
         ${Boost_INCLUDE_DIRS}
 )
 
 target_link_directories(main PUBLIC
-        ${XRT_LIB_DIR}
         ${Boost_LIBRARY_DIRS}
 )
 
 target_link_libraries(main PUBLIC
-        xrt_coreutil
         boost_program_options
         boost_filesystem
         m
