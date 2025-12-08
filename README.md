@@ -23,7 +23,7 @@ This project was conducted on a 2023 HP Victus 16-s0075nr 16" Laptop with an AMD
 
 ### NPU Execution
 
-In order to test the NPU code, the user must first compile the NPU img using the make file located in the respective _MatMat/MatVec_ folder. Then, the user can compile test.cpp using the _CMakeLists.txt_ file.
+In order to test the NPU code, the user must first compile the NPU image using the Makefile located in the respective _MatMat_ or _MatVec_ folder. Then, the user can compile test.cpp using the _CMakeLists.txt_ file.
 
 ## Contact
 
@@ -32,3 +32,4 @@ Victor Jimenez | victor.jimenez@colorado.edu
 ## Acknowledgments
 
 I would like to thank my advisors, Professor Tamara Silbergleit Lehman and Professor Eric Keller, for their support throughout this research project.
+I would also like to thank Professor Alessandro Peri, for his guidance and motivation for this project.
