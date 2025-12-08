@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(SIAMExecutable)
 
 # Set the C++ standard
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(POLICY CMP0167)
@@ -11,10 +11,6 @@ endif()
 
 set(CMAKE_C_COMPILER gcc-13)
 set(CMAKE_CXX_COMPILER g++-13)
-set(BOOST_ROOT /usr/include/boost CACHE STRING "Path to Boost install")
-
-# Find packages
-find_package(Boost REQUIRED)
 
 # Include all .c and .h files in the library folder
 file(GLOB LIBRARY_SOURCES "accelerator/*.cpp")
@@ -27,16 +23,4 @@ target_compile_definitions(main PUBLIC DISABLE_ABI_CHECK=1)
 
 set(CMAKE_CXX_FLAGS "-march=native -mavx512f -mavx512bw -mavx512vl -mavx512dq -mavx512bf16")
 
-target_include_directories (main PUBLIC
-        ${Boost_INCLUDE_DIRS}
-)
-
-target_link_directories(main PUBLIC
-        ${Boost_LIBRARY_DIRS}
-)
-
-target_link_libraries(main PUBLIC
-        boost_program_options
-        boost_filesystem
-        m
-)
+target_link_libraries(main PUBLIC m)
