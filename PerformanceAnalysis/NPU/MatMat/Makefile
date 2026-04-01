@@ -8,15 +8,15 @@
 # 
 ##===----------------------------------------------------------------------===##
 # VITIS related variables
-AIEOPT_DIR ?= $(shell realpath $(dir $(shell which aie-opt))/..)
+MLIR_AIE_INSTALL_DIR ?= $(shell pip show mlir_aie 2>/dev/null | grep '^Location:' | awk '{print $$2}')/mlir_aie
 
 WARNING_FLAGS = -Wno-parentheses -Wno-attributes -Wno-macro-redefined
 
-PEANOWRAP2_FLAGS = -O2 -v -std=c++23 --target=aie2-none-unknown-elf ${WARNING_FLAGS} -DNDEBUG -I ${AIEOPT_DIR}/include
+PEANOWRAP2_FLAGS = -O2 -v -std=c++23 --target=aie2-none-unknown-elf ${WARNING_FLAGS} -DNDEBUG -I ${MLIR_AIE_INSTALL_DIR}/include
 
 srcdir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-targetname=matrix_vector
+targetname=matrix_matrix
 mlir_target?=build/aie.mlir
 xclbin_target?=build/final.xclbin
 insts_target?=build/insts.bin
@@ -43,12 +43,12 @@ ${xclbin_target}: ${mlir_target} build/kernels.o
 				--aie-generate-npu-insts --npu-insts-name=${insts_target:build/%=%} $(<:%=../%)
 
 ${targetname}.exe: ${srcdir}/test.cpp
-	rm -rf build
-	mkdir -p build
-	cd build &&  cmake -E env CXXFLAGS="-std=c++23 -ggdb -march=native -pthread" \
+	rm -rf build_host
+	mkdir -p build_host
+	cd build_host &&  cmake -E env CXXFLAGS="-std=c++23 -ggdb -march=native -pthread" \
 		cmake ${srcdir} -D CMAKE_C_COMPILER=gcc-13 -D CMAKE_CXX_COMPILER=g++-13 -DTARGET_NAME=${targetname}
-	cd build &&  cmake --build . --config Release
-	cp build/${targetname} $@
+	cd build_host &&  cmake --build . --config Release
+	cp build_host/${targetname} $@
 
 xclbin_sign=/opt/xilinx/xrt/amdxdna/setup_xclbin_firmware.sh 
 .PHONY: sign
@@ -61,4 +61,4 @@ run: ${targetname}.exe ${xclbin_target}
 
 .PHONY: clean
 clean:
-	rm -rf build ${targetname}.exe
+	rm -rf build build_host ${targetname}.exe

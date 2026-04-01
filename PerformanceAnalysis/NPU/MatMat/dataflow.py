@@ -9,10 +9,10 @@ import sys
 from aie.dialects.aie import *
 from aie.dialects.aiex import *
 from aie.extras.context import mlir_mod_ctx
-from aie.helpers.dialects.ext.scf import _for as range_
+from aie.helpers.dialects.scf import _for as range_
 
 # Define how many columns we can use.
-dev = AIEDevice.npu1_4col
+dev = AIEDevice.npu1
 
 # Define the types used. Since dataflow is only used to move data,
 # only the size of the type matters, not the underlying type itself --- uint16 ≡ bfloat16.
@@ -71,10 +71,10 @@ def dataflow():
     @device(dev)
     def device_body():
         # Define the kernels accessed for computation. These have to match the definition in kernels.cc's extern block.
-        zero_kernel = external_func("zero", inputs=[np.ndarray[(m * n,), np.dtype[dtype_out]]])
+        zero_kernel = external_func("zero", inputs=[np.ndarray[(m * n,), np.dtype[dtype_out]]], link_with="kernels.o")
         mac_kernel = external_func("mac",   inputs=[np.ndarray[(m * k,), np.dtype[dtype_in]],
                                                     np.ndarray[(k * n,), np.dtype[dtype_in]],
-                                                    np.ndarray[(m * n,), np.dtype[dtype_out]]])
+                                                    np.ndarray[(m * n,), np.dtype[dtype_out]]], link_with="kernels.o")
 
         # Tile declarations. This will instantiate all rows for the accessed columns.
         ShimTiles = [tile(col, 0) for col in range(n_aie_columns)]
@@ -136,7 +136,7 @@ def dataflow():
         # and release the output.
         for col in range(n_aie_columns):
             for row in range(n_aie_compute_rows):
-                @core(ComputeTiles[col][row], "kernels.o")
+                @core(ComputeTiles[col][row])
                 def core_body():
                     # An "infinite" loop. This keeps the execution ready.
                     for _ in range_(sys.maxsize):
